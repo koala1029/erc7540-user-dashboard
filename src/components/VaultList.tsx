@@ -9,7 +9,7 @@ import { useWallet } from "@/contexts/WalletContext";
 
 import { token_abi } from '@/abis/token_abi';
 import { poolManager_abi } from '@/abis/poolManager_abi';
-import { INVESTMENT_MANAGER, POOL_MANAGER } from '@/utils/constants';
+import { INVESTMENT_MANAGER, POOL_MANAGER, RPC_PROVIDER } from '@/utils/constants';
 import { InvestmentManager_abi } from '@/abis/InvestmentManager_abi';
 import { ERC7540Vault_abi } from '@/abis/eRC7540Vault_abi';
 import { formatDuration } from '@/utils/helper';
@@ -70,16 +70,18 @@ const VaultList: React.FC<VaultListProps> = ({ onVaultSelect }) => {
 
   const getVaultList = async () => {
     try {
-      const poolManagerContract = new ethers.Contract(POOL_MANAGER, poolManager_abi, provider);
-      const investmentManagerContract = new ethers.Contract(INVESTMENT_MANAGER, InvestmentManager_abi, provider);
+      const rpc_provider = new ethers.providers.JsonRpcProvider(RPC_PROVIDER);
+      
+      const poolManagerContract = new ethers.Contract(POOL_MANAGER, poolManager_abi, rpc_provider);
+      const investmentManagerContract = new ethers.Contract(INVESTMENT_MANAGER, InvestmentManager_abi, rpc_provider);
 
       const vaults: any[] = await poolManagerContract.getAllVaults();
 
 
       const vaultDataPromises = vaults.map(async (vault) => {
-        const shareContract = new ethers.Contract(vault.share, token_abi, provider);
-        const assetContract = new ethers.Contract(vault.asset, token_abi, provider);
-        const vaultContract = new ethers.Contract(vault.vaultAddress, ERC7540Vault_abi, provider);
+        const shareContract = new ethers.Contract(vault.share, token_abi, rpc_provider);
+        const assetContract = new ethers.Contract(vault.asset, token_abi, rpc_provider);
+        const vaultContract = new ethers.Contract(vault.vaultAddress, ERC7540Vault_abi, rpc_provider);
         const timeLockPeriod = await vaultContract.timeLockPeriod();
 
 

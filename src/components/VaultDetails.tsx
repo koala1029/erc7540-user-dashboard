@@ -10,7 +10,7 @@ import { VaultService, VaultRequest, RequestStatus, RequestType } from '@/utils/
 import { ArrowLeft, ArrowDownIcon, ArrowUpIcon, RefreshCw, TrendingUp, Users, DollarSign, Vault } from 'lucide-react';
 import RequestList from './RequestList';
 import { ethers } from 'ethers';
-import { INVESTMENT_MANAGER, POOL_MANAGER } from '@/utils/constants';
+import { INVESTMENT_MANAGER, POOL_MANAGER, RPC_PROVIDER } from '@/utils/constants';
 import { poolManager_abi } from '@/abis/poolManager_abi';
 import { InvestmentManager_abi } from '@/abis/InvestmentManager_abi';
 import { token_abi } from '@/abis/token_abi';
@@ -67,21 +67,23 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
 
   const getVaultList = async () => {
     try {
-      const poolManagerContract = new ethers.Contract(POOL_MANAGER, poolManager_abi, provider);
-      const investmentManagerContract = new ethers.Contract(INVESTMENT_MANAGER, InvestmentManager_abi, provider);
+      console.log("========================>>>>>>");
+      const rpc_provider = new ethers.providers.JsonRpcProvider(RPC_PROVIDER);
+      const poolManagerContract = new ethers.Contract(POOL_MANAGER, poolManager_abi, rpc_provider);
+      const investmentManagerContract = new ethers.Contract(INVESTMENT_MANAGER, InvestmentManager_abi, rpc_provider);
 
       const vaults: any[] = await poolManagerContract.getAllVaults();
       for(let i = 0; i < vaults.length; i++) {
         if(Number(vaults[i].vaultId).toString() == vaultId) {
-          const vaultContract = new ethers.Contract(vaults[i].vaultAddress, ERC7540Vault_abi, provider);
+          const vaultContract = new ethers.Contract(vaults[i].vaultAddress, ERC7540Vault_abi, rpc_provider);
           const duration = Number(await vaultContract.timeLockPeriod());
           // setLockDuration(formatDuration(duration));
           setVaultAddress(vaults[i].vaultAddress);
           setAssetAddress(vaults[i].asset);
           setShareAddress(vaults[i].share);
 
-          const shareContract = new ethers.Contract(vaults[i].share, token_abi, provider);
-          const assetContract = new ethers.Contract(vaults[i].asset, token_abi, provider);
+          const shareContract = new ethers.Contract(vaults[i].share, token_abi, rpc_provider);
+          const assetContract = new ethers.Contract(vaults[i].asset, token_abi, rpc_provider);
 
           const [name, symbol, a_name, a_symbol, state, a_decimal, s_decimal, a_balance, s_balance] = await Promise.all([
             shareContract.name(),
@@ -164,6 +166,10 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
     }
     getVaultList();
   }, [signer, vaultAddress, assetAddress]);
+
+  useEffect(() => {
+    getVaultList();
+  }, [])
 
   useEffect(() => {
     if (account && isConnected) {

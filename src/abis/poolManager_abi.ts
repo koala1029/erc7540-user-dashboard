@@ -441,11 +441,6 @@ export const poolManager_abi = [
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        },
-        {
           "internalType": "address",
           "name": "asset",
           "type": "address"
@@ -626,6 +621,19 @@ export const poolManager_abi = [
           "internalType": "bool",
           "name": "allowed",
           "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextVaultId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
