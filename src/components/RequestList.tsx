@@ -17,6 +17,7 @@ interface RequestListProps {
   requests: VaultRequest[];
   onFinalizeRequest: (request: VaultRequest) => void;
   isLoading: boolean;
+  isContentLoading: boolean;
   vaultSymbol: string;
   assetSymbol: string;
 }
@@ -27,6 +28,7 @@ const RequestList: React.FC<RequestListProps> = ({
   requests, 
   onFinalizeRequest, 
   isLoading,
+  isContentLoading,
   vaultSymbol,
   assetSymbol 
 }) => {
@@ -197,16 +199,28 @@ const RequestList: React.FC<RequestListProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedRequests.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-12">
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <RefreshCw className="h-8 w-8 opacity-50" />
-                      <p className="font-medium">No requests found</p>
-                      <p className="text-sm">Try adjusting your filters</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
+              {paginatedRequests.length == 0 ? (
+                isContentLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-12">
+                      <div className="text-center py-12">
+                        <div className="h-12 w-12 mx-auto mb-4 animate-spin border-4 border-muted-foreground border-t-transparent rounded-full" />
+                        <h3 className="text-lg font-semibold mb-2">Loading requests...</h3>
+                        <p className="text-muted-foreground">Please wait while we fetch your data</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-12">
+                      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                        <RefreshCw className="h-8 w-8 opacity-50" />
+                        <p className="font-medium">No requests found</p>
+                        <p className="text-sm">Try adjusting your filters</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
               ) : (
                 paginatedRequests.map((request, index) => (
                   <TableRow key={index} className="hover:bg-muted/30 transition-colors">

@@ -53,6 +53,7 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
   const [depositAmount, setDepositAmount] = useState('');
   const [redeemAmount, setRedeemAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isContentLoading, setIsContentLoading] = useState(false);
   const [requests, setRequests] = useState<VaultRequest[]>([]);
   const [vaultService, setVaultService] = useState<VaultService | null>(null);
   const [vaultAddress, setVaultAddress] = useState("");
@@ -67,7 +68,7 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
 
   const getVaultList = async () => {
     try {
-      console.log("========================>>>>>>");
+      setIsContentLoading(true);
       const rpc_provider = new ethers.providers.JsonRpcProvider(RPC_PROVIDER);
       const poolManagerContract = new ethers.Contract(POOL_MANAGER, poolManager_abi, rpc_provider);
       const investmentManagerContract = new ethers.Contract(INVESTMENT_MANAGER, InvestmentManager_abi, rpc_provider);
@@ -153,10 +154,11 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
             items.push(item);
           }
           setRequests(items)
+          setIsContentLoading(false);
         }
       }
-
     } catch (error) {
+      setIsContentLoading(false);
       console.error("Error fetching vaults:", error);
     }
   };
@@ -508,6 +510,7 @@ const VaultDetails: React.FC<VaultDetailsProps> = ({ vaultId, lockDuration, onBa
         requests={requests}
         onFinalizeRequest={handleFinalizeRequest}
         isLoading={isLoading}
+        isContentLoading = {isContentLoading}
         vaultSymbol={vaultInfo.symbol}
         assetSymbol={vaultInfo.assetSymbol}
       />
